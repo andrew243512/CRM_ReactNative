@@ -8,14 +8,16 @@ import {
   ViewStyle,
   ImageStyle,
   StyleProp,
+  TouchableOpacity,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {Person} from '../store/reducers/person.reducer';
+import {Person, PersonReducer} from '../store/reducers/person.reducer';
 import {getTheme} from 'react-native-material-kit';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type SectionProps = PropsWithChildren<{
   person: Person;
+  navigation: any;
 }>;
 
 const styles = StyleSheet.create({
@@ -46,50 +48,53 @@ const styles = StyleSheet.create({
   },
 });
 
-export function PersonItem({person}: SectionProps): JSX.Element {
+export function PersonItem({person, navigation}: SectionProps): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const theme = getTheme();
+
   return (
-    <View
-      style={[
-        theme.cardStyle as StyleProp<ViewStyle>,
-        styles.sectionContainer,
-      ]}>
-      <Image
-        source={require('../assets/img/background.jpg')}
-        style={[theme.cardImageStyle as StyleProp<ImageStyle>, styles.image]}
-      />
-      <Ionicons name="person" size={100} style={styles.icon} />
-      <Text
+    <TouchableOpacity onPress={() => navigation(person)}>
+      <View
         style={[
-          theme.cardTitleStyle as StyleProp<ViewStyle>,
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
+          theme.cardStyle as StyleProp<ViewStyle>,
+          styles.sectionContainer,
         ]}>
-        Name: {person.name}
-      </Text>
-      <Text
-        style={[
-          theme.cardContentStyle as StyleProp<ViewStyle>,
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        Height: {person.height} cm
-      </Text>
-      <Text
-        style={[
-          theme.cardContentStyle as StyleProp<ViewStyle>,
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        Hair Color: {person.hair_color}
-      </Text>
-    </View>
+        <Image
+          source={require('../assets/img/background.jpg')}
+          style={[theme.cardImageStyle as StyleProp<ImageStyle>, styles.image]}
+        />
+        <Ionicons name="person" size={100} style={styles.icon} />
+        <Text
+          style={[
+            theme.cardTitleStyle as StyleProp<ViewStyle>,
+            styles.sectionTitle,
+            {
+              color: isDarkMode ? Colors.white : Colors.black,
+            },
+          ]}>
+          Name: {person.firstName} {person.lastName}
+        </Text>
+        <Text
+          style={[
+            theme.cardContentStyle as StyleProp<ViewStyle>,
+            styles.sectionDescription,
+            {
+              color: isDarkMode ? Colors.light : Colors.dark,
+            },
+          ]}>
+          Email: {person.email}
+        </Text>
+        <Text
+          style={[
+            theme.cardContentStyle as StyleProp<ViewStyle>,
+            styles.sectionDescription,
+            {
+              color: isDarkMode ? Colors.light : Colors.dark,
+            },
+          ]}>
+          Company: {person.company}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 }

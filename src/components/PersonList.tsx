@@ -1,39 +1,34 @@
 import {
   useColorScheme,
-  View,
-  Text,
   StyleSheet,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   FlatList,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {createStore} from 'redux';
-import {Person, PersonReducer} from '../store/reducers/person.reducer';
-import {PropsWithChildren, useEffect, useState} from 'react';
-import {Provider, connect} from 'react-redux';
+import {Person} from '../store/reducers/person.reducer';
+import {useEffect} from 'react';
+import {connect, useSelector, useDispatch} from 'react-redux';
 import {PersonItem} from './PersonItem';
+import { getPeople, selectPerson } from '../store/actions/person.action';
 
-export function PersonList(): JSX.Element {
-  let [personList, setPersonList] = useState([] as Person[]);
+function PersonList({navigation}: any): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const store = createStore(
-    PersonReducer,
-    window.__REDUX_DEVTOOLS_EXTENSION__ &&
-      window.__REDUX_DEVTOOLS_EXTENSION__(),
-  );
-  store.subscribe(() => {
-    setPersonList(store.getState().people);
-  });
+  const dispatch = useDispatch();
+  const personList = useSelector((state: {people: Person[]}) => state.people);
 
   useEffect(() => {
-    store.dispatch({type: 'get/people'});
-  }, []);
+    dispatch(getPeople());
+  }, [dispatch]);
+
+  const navigateToDetail = (person: Person) => {
+    dispatch(selectPerson(person));
+    navigation.navigate('Detail');
+  };
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -45,7 +40,9 @@ export function PersonList(): JSX.Element {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}
         data={personList}
-        renderItem={({item}) => <PersonItem person={item} />}
+        renderItem={({item}) => (
+          <PersonItem person={item} navigation={navigateToDetail} />
+        )}
       />
     </SafeAreaView>
   );
@@ -73,4 +70,4 @@ const mapStateToProps = (state: {people: Person[]}) => {
   };
 };
 
-export default connect(mapStateToProps)(PersonList);
+export default connect(mapStateToProps, {getPeople})(PersonList);
